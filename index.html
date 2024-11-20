@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Carros</h1>
+
+    <div class="form-container">
+        <input type="text" id="marca" placeholder="Marca" />
+        <input type="text" id="modelo" placeholder="Modelo" />
+        <input type="number" id="ano" placeholder="Ano" />
+        <input type="text" id="cor" placeholder="Cor" />
+        <input type="text" id="combustivel" placeholder="Combustível" />
+        <button onclick="addCar()">Adicionar</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Ano</th>
+                <th>Cor</th>
+                <th>Combustível</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="carTable">
+            <!-- Os dados serão inseridos dinamicamente aqui -->
+        </tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>
