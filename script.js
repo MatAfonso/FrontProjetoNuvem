@@ -1,9 +1,12 @@
-const API_URL = "/api/cars"; 
+const API_URL = "/api/cars";
+
+// Variável para controlar o estado de edição
+let editCarId = null;
 
 // Carrega os carros ao carregar a página
 document.addEventListener("DOMContentLoaded", loadCars);
 
-// Função para carregar carros do backend
+// Carrega os carros do backend
 async function loadCars() {
     const response = await fetch(API_URL);
     const cars = await response.json();
@@ -30,8 +33,8 @@ async function loadCars() {
     });
 }
 
-// Adiciona um novo carro
-async function addCar() {
+// Gerencia a adição ou edição de um carro
+async function handleAddOrEdit() {
     const marca = document.getElementById("marca").value;
     const modelo = document.getElementById("modelo").value;
     const ano = parseInt(document.getElementById("ano").value);
@@ -43,59 +46,68 @@ async function addCar() {
         return;
     }
 
-    const newCar = { marca, modelo, ano, cor, combustivel };
+    const carData = { marca, modelo, ano, cor, combustivel };
 
-    const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCar)
-    });
-
-    if (response.ok) {
-        loadCars(); // Atualiza a tabela
-        alert("Carro adicionado com sucesso!");
-    } else {
-        alert("Erro ao adicionar carro!");
-    }
-}
-
-// Edita um carro
-async function editCar(id) {
-    const row = document.querySelector(`tr[data-id='${id}']`);
-    const marca = prompt("Editar Marca:", row.children[1].innerText);
-    const modelo = prompt("Editar Modelo:", row.children[2].innerText);
-    const ano = prompt("Editar Ano:", row.children[3].innerText);
-    const cor = prompt("Editar Cor:", row.children[4].innerText);
-    const combustivel = prompt("Editar Combustível:", row.children[5].innerText);
-
-    if (marca && modelo && ano && cor && combustivel) {
-        const updatedCar = { id, marca, modelo, ano: parseInt(ano), cor, combustivel };
-
-        const response = await fetch(`${API_URL}/${id}`, {
+    if (editCarId) {
+        // Atualiza carro existente
+        const response = await fetch(`${API_URL}/${editCarId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedCar)
+            body: JSON.stringify(carData)
         });
 
         if (response.ok) {
-            loadCars(); // Atualiza a tabela
             alert("Carro atualizado com sucesso!");
         } else {
             alert("Erro ao atualizar carro!");
         }
+        editCarId = null; // Reseta o ID de edição
+        document.getElementById("addEditButton").innerText = "Adicionar";
     } else {
-        alert("Todos os campos devem ser preenchidos!");
+        // Adiciona um novo carro
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(carData)
+        });
+
+        if (response.ok) {
+            alert("Carro adicionado com sucesso!");
+        } else {
+            alert("Erro ao adicionar carro!");
+        }
     }
+
+    clearForm();
+    loadCars();
 }
 
-// Exclui um carro
-async function deleteCar(id) {
-    const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+// Preenche o formulário com os dados do carro em edição
+function editCar(id) {
+    const row = document.querySelector(`tr[data-id='${id}']`);
+    const marca = row.children[1].innerText;
+    const modelo = row.children[2].innerText;
+    const ano = row.children[3].innerText;
+    const cor = row.children[4].innerText;
+    const combustivel = row.children[5].innerText;
 
-    if (response.ok) {
-        loadCars(); // Atualiza a tabela
-        alert("Carro excluído com sucesso!");
-    } else {
-        alert("Erro ao excluir carro!");
-    }
+    // Preenche o formulário
+    document.getElementById("marca").value = marca;
+    document.getElementById("modelo").value = modelo;
+    document.getElementById("ano").value = ano;
+    document.getElementById("cor").value = cor;
+    document.getElementById("combustivel").value = combustivel;
+
+    // Ajusta o estado para edição
+    editCarId = id;
+    document.getElementById("addEditButton").innerText = "Salvar";
+}
+
+// Limpa o formulário e reseta o estado
+function clearForm() {
+    document.getElementById("marca").value = "";
+    document.getElementById("modelo").value = "";
+    document.getElementById("ano").value = "";
+    document.getElementById("cor").value = "";
+    document.getElementById("combustivel").value = "";
 }
