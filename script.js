@@ -6,7 +6,7 @@ let editCarId = null;
 // Carrega os carros ao carregar a página
 document.addEventListener("DOMContentLoaded", loadCars);
 
-// Carrega os carros do backend
+// Função para carregar carros do backend
 async function loadCars() {
     const response = await fetch(API_URL);
     const cars = await response.json();
@@ -25,7 +25,7 @@ async function loadCars() {
             <td>${car.cor}</td>
             <td>${car.combustivel}</td>
             <td>
-                <button onclick="editCar(${car.id})">Editar</button>
+                <button onclick="startEditCar(${car.id})">Editar</button>
                 <button onclick="deleteCar(${car.id})">Excluir</button>
             </td>
         `;
@@ -82,8 +82,8 @@ async function handleAddOrEdit() {
     loadCars();
 }
 
-// Preenche o formulário com os dados do carro em edição
-function editCar(id) {
+// Função para iniciar a edição de um carro
+function startEditCar(id) {
     const row = document.querySelector(`tr[data-id='${id}']`);
     const marca = row.children[1].innerText;
     const modelo = row.children[2].innerText;
@@ -103,6 +103,18 @@ function editCar(id) {
     document.getElementById("addEditButton").innerText = "Salvar";
 }
 
+// Exclui um carro
+async function deleteCar(id) {
+    const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+
+    if (response.ok) {
+        alert("Carro excluído com sucesso!");
+        loadCars();
+    } else {
+        alert("Erro ao excluir carro!");
+    }
+}
+
 // Limpa o formulário e reseta o estado
 function clearForm() {
     document.getElementById("marca").value = "";
@@ -110,4 +122,6 @@ function clearForm() {
     document.getElementById("ano").value = "";
     document.getElementById("cor").value = "";
     document.getElementById("combustivel").value = "";
+    editCarId = null;
+    document.getElementById("addEditButton").innerText = "Adicionar";
 }
